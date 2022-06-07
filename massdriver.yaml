@@ -1,0 +1,116 @@
+schema: draft-07
+name: aws-msk-cluster
+description: "High scale event bus managed by AWS"
+ref: github.com/massdriver-cloud/massdriver-bundles
+access: "public"
+type: bundle
+
+steps:
+  - path: src
+    provisioner: terraform
+
+params:
+  examples:
+    - __name: Staging
+      kafka_version: "2.6.2"
+      brokers_per_zone: 1
+      instance_type: kafka.t3.small
+      volume_size: 100
+      logging_method: cloudwatch
+    - __name: Production
+      kafka_version: "2.6.2"
+      brokers_per_zone: 1
+      instance_type: kafka.m5.2xlarge
+      volume_size: 500
+      logging_method: s3
+  required:
+    - kafka_version
+    - brokers_per_zone
+    - instance_type
+    - volume_size
+    - logging_method
+  properties:
+    kafka_version:
+      type: string
+      title: Kafka Version
+      description: The version of Kafka to run
+      default: "2.6.2"
+      enum:
+        - "2.8.1"
+        - "2.8.0"
+        - "2.7.2"
+        - "2.7.0"
+        - "2.6.3"
+        - "2.6.2"
+        - "2.6.1"
+        - "2.6.0"
+        - "2.5.1"
+        - "2.4.1.1"
+        - "2.3.1"
+        - "2.2.1"
+    brokers_per_zone:
+      type: number
+      title: Brokers Per AZ
+      description: Number of brokers per availability zone.
+      default: 1
+      enum:
+        - 1
+        - 2
+        - 3
+        - 4
+    instance_type:
+      type: string
+      title: Instance Type
+      description: Type of instance for brokers.
+      enum:
+        - kafka.t3.small
+        - kafka.m5.large
+        - kafka.m5.xlarge
+        - kafka.m5.2xlarge
+        - kafka.m5.4xlarge
+        - kafka.m5.8xlarge
+        - kafka.m5.12xlarge
+        - kafka.m5.16xlarge
+        - kafka.m5.24xlarge
+    volume_size:
+      type: integer
+      title: Broker Volume Size (GiB)
+      description: EBS volume size for message storage in GiB (between 1 and 16384).
+      minimum: 1
+      maximum: 16384
+    logging_method:
+      type: string
+      title: Logging Method
+      description: Method used to store kafka logs
+      default: "cloudwatch"
+      enum:
+        - "cloudwatch"
+        - "s3"
+
+# schema-connections.json
+# Named list of input connections (artifacts) (map[name]artifact)
+connections:
+  required:
+    - aws_authentication
+    - vpc
+  properties:
+    aws_authentication:
+      $ref: massdriver/aws-iam-role
+    vpc:
+      $ref: massdriver/aws-vpc
+
+artifacts:
+  required:
+    - authentication
+  properties:
+    authentication:
+      $ref: massdriver/kafka-authentication
+
+ui:
+  ui:order:
+    - kafka_version
+    - brokers_per_zone
+    - instance_type
+    - volume_size
+    - logging_method
+    - "*"
