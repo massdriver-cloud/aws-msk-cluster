@@ -1,6 +1,6 @@
 schema: draft-07
 name: aws-msk-cluster
-description: "High scale event bus managed by AWS"
+description: "Amazon Managed Streaming for Apache Kafka (MSK). Securely stream data with a fully managed, highly available Apache Kafka service."
 ref: github.com/massdriver-cloud/massdriver-bundles
 access: "public"
 type: bundle
