@@ -59,7 +59,7 @@ resource "aws_cloudwatch_metric_alarm" "high_cpu" {
 }
 
 module "storage_capacity_alarm" {
-  source = "github.com/massdriver-cloud/terraform-modules//aws-cloudwatch-alarm?ref= 3ec7921"
+  source = "github.com/massdriver-cloud/terraform-modules//aws-cloudwatch-alarm?ref=3ec7921"
 
   depends_on = [aws_msk_cluster.main]
 
