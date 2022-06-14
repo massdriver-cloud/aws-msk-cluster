@@ -1,12 +1,13 @@
 # https://docs.aws.amazon.com/msk/latest/developerguide/bestpractices.html
 
 # TODO: move this to using our aws-cloudwatch-alarm module below, not positive why its not today.
-locals {
-  enable_alarms = lookup(var.md_metadata.observability.alarm_channels, "aws", null) != null
+
+module "alarm_channel" {
+  source      = "github.com/massdriver-cloud/terraform-modules//aws-alarm-channel?ref=aa08797"
+  md_metadata = var.md_metadata
 }
 
 resource "aws_cloudwatch_metric_alarm" "high_cpu" {
-  count               = local.enable_alarms ? 1 : 0
   depends_on          = [aws_msk_cluster.main]
   alarm_name          = "MSK high CPU usage"
   comparison_operator = "GreaterThanThreshold"
@@ -17,8 +18,8 @@ resource "aws_cloudwatch_metric_alarm" "high_cpu" {
     message     = "Total CPU consumption of MSK cluster ${aws_msk_cluster.main.cluster_name} is above 60%. If auto-scaling is not enabled increase your instance size or number of nodes."
   })
   actions_enabled = "true"
-  alarm_actions   = [var.md_metadata.observability.alarm_channels.aws.arn]
-  ok_actions      = [var.md_metadata.observability.alarm_channels.aws.arn]
+  alarm_actions   = [module.alarm_channel.arn]
+  ok_actions      = [module.alarm_channel.arn]
 
   metric_query {
     id          = "m3"
@@ -59,7 +60,8 @@ resource "aws_cloudwatch_metric_alarm" "high_cpu" {
 }
 
 module "storage_capacity_alarm" {
-  source = "github.com/massdriver-cloud/terraform-modules//aws-cloudwatch-alarm?ref=3ec7921"
+  source        = "github.com/massdriver-cloud/terraform-modules//aws-cloudwatch-alarm?ref=aa08797"
+  sns_topic_arn = module.alarm_channel.arn
 
   depends_on = [aws_msk_cluster.main]
 
