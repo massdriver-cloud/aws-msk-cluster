@@ -59,13 +59,19 @@ resource "aws_cloudwatch_metric_alarm" "high_cpu" {
   }
 }
 
+resource "massdriver_package_alarm" "high_cpu" {
+  cloud_resource_id = aws_cloudwatch_metric_alarm.high_cpu.arn
+  display_name      = "Cluster CPU Usage Alarm"
+}
+
 module "storage_capacity_alarm" {
-  source        = "github.com/massdriver-cloud/terraform-modules//aws-cloudwatch-alarm?ref=aa08797"
+  source        = "github.com/massdriver-cloud/terraform-modules//aws-cloudwatch-alarm?ref=8997456"
   sns_topic_arn = module.alarm_channel.arn
 
   depends_on = [aws_msk_cluster.main]
 
   md_metadata         = var.md_metadata
+  display_name        = "Storage Capacity"
   message             = "Total disk usage of AWS MSK cluster ${aws_msk_cluster.main.cluster_name} has reached 85% capacity. Increase the volume size to prevent data loss."
   alarm_name          = "${aws_msk_cluster.main.cluster_name}-lowStorageCapacity"
   comparison_operator = "GreaterThanThreshold"
