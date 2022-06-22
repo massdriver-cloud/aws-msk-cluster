@@ -1,7 +1,6 @@
 resource "massdriver_artifact" "authentication" {
   field                = "authentication"
   provider_resource_id = aws_msk_cluster.main.arn
-  type                 = "aws-msk-cluster"
   name                 = "AWS Managed Service for Kafka: ${aws_msk_cluster.main.cluster_name}"
   artifact = jsonencode(
     {
