@@ -1,13 +1,17 @@
 locals {
-  server_properties = ""
-  subnets           = [for subnet in slice(var.vpc.data.infrastructure.internal_subnets, 0, 3) : element(split("/", subnet["arn"]), 1)]
-  num_zones         = min(3, length(var.vpc.data.infrastructure.internal_subnets)) # must be 2 or 3
-  vpc_id            = element(split("/", var.vpc.data.infrastructure.arn), 1)
+  server_properties  = ""
+  private_subnet_ids = [for subnet in var.vpc.data.infrastructure.private_subnets : element(split("/", subnet["arn"]), 1)]
+  num_zones          = min(3, length(var.vpc.data.infrastructure.private_subnets)) # must be 2 or 3
+  vpc_id             = element(split("/", var.vpc.data.infrastructure.arn), 1)
 }
 
 resource "random_shuffle" "subnets" {
-  input        = [for subnet in var.vpc.data.infrastructure.internal_subnets : element(split("/", subnet["arn"]), 1)]
+  input        = local.private_subnet_ids
   result_count = local.num_zones
+
+  keepers = {
+    "vpc_id" = local.vpc_id
+  }
 }
 
 resource "aws_security_group" "internal_security_group" {
