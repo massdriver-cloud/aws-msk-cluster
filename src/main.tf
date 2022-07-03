@@ -8,6 +8,11 @@ locals {
 resource "random_shuffle" "subnets" {
   input        = [for subnet in var.vpc.data.infrastructure.internal_subnets : element(split("/", subnet["arn"]), 1)]
   result_count = local.num_zones
+
+  // reset if the VPC changes
+  keepers = {
+    "vpc_arn" = var.vpc.data.infrastructure.arn
+  }
 }
 
 resource "aws_security_group" "internal_security_group" {
@@ -15,12 +20,7 @@ resource "aws_security_group" "internal_security_group" {
   vpc_id      = local.vpc_id
 }
 
-resource "aws_security_group" "external_security_group" {
-  name_prefix = "${var.md_metadata.name_prefix}-external"
-  vpc_id      = local.vpc_id
-}
-
-resource "aws_security_group_rule" "msk_tls" {
+resource "aws_security_group_rule" "internal_kafka_tls" {
   from_port         = 9094
   to_port           = 9094
   protocol          = "tcp"
@@ -29,13 +29,38 @@ resource "aws_security_group_rule" "msk_tls" {
   self              = true
 }
 
-resource "aws_security_group_rule" "zookeeper_tls" {
+resource "aws_security_group_rule" "internal_zookeeper_tls" {
   from_port         = 2182
   to_port           = 2182
   protocol          = "tcp"
   security_group_id = aws_security_group.internal_security_group.id
   type              = "ingress"
   self              = true
+}
+
+resource "aws_security_group" "external_security_group" {
+  name_prefix = "${var.md_metadata.name_prefix}-external"
+  vpc_id      = local.vpc_id
+}
+
+resource "aws_security_group_rule" "external_kafka_tls" {
+  count             = true ? 1 : 0
+  from_port         = 9094
+  to_port           = 9094
+  protocol          = "tcp"
+  security_group_id = aws_security_group.external_security_group.id
+  cidr_blocks       = [var.vpc.data.infrastructure.cidr]
+  type              = "ingress"
+}
+
+resource "aws_security_group_rule" "external_zookeeper_tls" {
+  count             = true ? 1 : 0
+  from_port         = 2182
+  to_port           = 2182
+  protocol          = "tcp"
+  security_group_id = aws_security_group.external_security_group.id
+  cidr_blocks       = [var.vpc.data.infrastructure.cidr]
+  type              = "ingress"
 }
 
 resource "random_id" "configuration" {
@@ -83,6 +108,13 @@ resource "aws_msk_cluster" "main" {
   configuration_info {
     arn      = aws_msk_configuration.main.arn
     revision = aws_msk_configuration.main.latest_revision
+  }
+
+  encryption_info {
+    encryption_in_transit {
+      client_broker = "TLS"
+      in_cluster    = true
+    }
   }
 
   logging_info {
