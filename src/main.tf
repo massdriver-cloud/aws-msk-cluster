@@ -21,6 +21,7 @@ resource "aws_security_group" "internal_security_group" {
 }
 
 resource "aws_security_group_rule" "internal_kafka_tls" {
+  description       = "Allow cluster internal access to Kafka TLS"
   from_port         = 9094
   to_port           = 9094
   protocol          = "tcp"
@@ -30,6 +31,7 @@ resource "aws_security_group_rule" "internal_kafka_tls" {
 }
 
 resource "aws_security_group_rule" "internal_zookeeper_tls" {
+  description       = "Allow cluster internal access to ZooKeeper TLS"
   from_port         = 2182
   to_port           = 2182
   protocol          = "tcp"
@@ -45,6 +47,7 @@ resource "aws_security_group" "external_security_group" {
 
 resource "aws_security_group_rule" "external_kafka_tls" {
   count             = true ? 1 : 0
+  description       = "Allow VPC access to Kafka TLS"
   from_port         = 9094
   to_port           = 9094
   protocol          = "tcp"
@@ -55,6 +58,7 @@ resource "aws_security_group_rule" "external_kafka_tls" {
 
 resource "aws_security_group_rule" "external_zookeeper_tls" {
   count             = true ? 1 : 0
+  description       = "Allow VPC access to ZooKeeper TLS"
   from_port         = 2182
   to_port           = 2182
   protocol          = "tcp"
@@ -144,6 +148,7 @@ resource "aws_cloudwatch_log_group" "msk_logs" {
 }
 
 resource "aws_s3_bucket" "msk_logs_bucket" {
+  #bridgecrew:skip=BC_AWS_S3_13:Skipping `Enable S3 Bucket Logging` since this is already a logging bucket
   count  = var.logging_method == "s3" ? 1 : 0
   bucket = "${var.md_metadata.name_prefix}-logs}"
 }
