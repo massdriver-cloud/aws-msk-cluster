@@ -122,11 +122,6 @@ Connections from other bundles that this bundle depends on.
         "us-west-2"
         ```
 
-      - **`resource`** *(string)*
-      - **`service`** *(string)*
-      - **`zone`** *(string)*: AWS Availability Zone.
-
-        Examples:
 - **`vpc`** *(object)*: . Cannot contain additional properties.
   - **`data`** *(object)*
     - **`infrastructure`** *(object)*
@@ -248,11 +243,6 @@ Connections from other bundles that this bundle depends on.
         "us-west-2"
         ```
 
-      - **`resource`** *(string)*
-      - **`service`** *(string)*
-      - **`zone`** *(string)*: AWS Availability Zone.
-
-        Examples:
 <!-- CONNECTIONS:END -->
 
 </details>
@@ -290,7 +280,7 @@ Resources created by this bundle that can be connected to other bundles.
       - **One of**
         - AWS Security information*object*: Informs downstream services of network and/or IAM policies. Cannot contain additional properties.
           - **`iam`** *(object)*: IAM Policies. Cannot contain additional properties.
-            - **`^[a-z-/]+$`** *(object)*
+            - **`^[a-z]+[a-z_]*[a-z]+$`** *(object)*
               - **`policy_arn`** *(string)*: AWS IAM policy ARN.
 
                 Examples:
@@ -301,6 +291,18 @@ Resources created by this bundle that can be connected to other bundles.
                 ```json
                 "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
                 ```
+
+          - **`identity`** *(object)*: For instances where IAM policies must be attached to a role attached to an AWS resource, for instance AWS Eventbridge to Firehose, this attribute should be used to allow the downstream to attach it's policies (Firehose) directly to the IAM role created by the upstream (Eventbridge). It is important to remember that connections in massdriver are one way, this scheme perserves the dependency relationship while allowing bundles to control the lifecycles of resources under it's management. Cannot contain additional properties.
+            - **`role_arn`** *(string)*: ARN for this resources IAM Role.
+
+              Examples:
+              ```json
+              "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
+              ```
+
+              ```json
+              "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
+              ```
 
           - **`network`** *(object)*: AWS security group rules to inform downstream services of ports to open for communication. Cannot contain additional properties.
             - **`^[a-z-]+$`** *(object)*
@@ -318,6 +320,49 @@ Resources created by this bundle that can be connected to other bundles.
               - **`port`** *(integer)*: Port number. Minimum: `0`. Maximum: `65535`.
               - **`protocol`** *(string)*: Must be one of: `['tcp', 'udp']`.
   - **`specs`** *(object)*
+    - **`aws`** *(object)*: .
+      - **`region`** *(string)*: AWS Region to provision in.
+
+        Examples:
+        ```json
+        "us-west-2"
+        ```
+
+    - **`azure`** *(object)*: .
+      - **`region`** *(string)*: Select the Azure region you'd like to provision your resources in.
+    - **`gcp`** *(object)*: .
+      - **`project`** *(string)*
+      - **`region`** *(string)*: The GCP region to provision resources in.
+
+        Examples:
+        ```json
+        "us-east1"
+        ```
+
+        ```json
+        "us-east4"
+        ```
+
+        ```json
+        "us-west1"
+        ```
+
+        ```json
+        "us-west2"
+        ```
+
+        ```json
+        "us-west3"
+        ```
+
+        ```json
+        "us-west4"
+        ```
+
+        ```json
+        "us-central1"
+        ```
+
     - **`kafka`** *(object)*: Informs downstream bundles of Kafka specific data. Cannot contain additional properties.
       - **`version`** *(string)*: Currently deployed Kafka version.
 <!-- ARTIFACTS:END -->
