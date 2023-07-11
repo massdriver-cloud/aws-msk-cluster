@@ -19,6 +19,10 @@ resource "aws_security_group" "internal_security_group" {
   name_prefix = "${var.md_metadata.name_prefix}-internal"
   vpc_id      = local.vpc_id
   description = "Allow internal traffic between Kafka broker nodes for cluster ${var.md_metadata.name_prefix}"
+
+  tags = {
+    "Name" = "${var.md_metadata.name_prefix}-internal"
+  }
 }
 
 resource "aws_security_group_rule" "internal_kafka_tls" {
@@ -45,6 +49,10 @@ resource "aws_security_group" "external_security_group" {
   name_prefix = "${var.md_metadata.name_prefix}-external"
   vpc_id      = local.vpc_id
   description = "Allow external access to Kafka cluster ${var.md_metadata.name_prefix}"
+
+  tags = {
+    "Name" = "${var.md_metadata.name_prefix}-external"
+  }
 }
 
 resource "aws_security_group_rule" "external_kafka_tls" {
