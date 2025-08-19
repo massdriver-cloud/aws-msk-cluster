@@ -3,7 +3,6 @@ name: aws-msk-cluster
 version: 1.0.0
 description: Amazon Managed Streaming for Apache Kafka (MSK). Securely stream data with a fully managed, highly available Apache Kafka service.
 source_url: https://github.com/massdriver-cloud/aws-msk-cluster
-type: application
 steps:
 - path: src
   provisioner: opentofu
