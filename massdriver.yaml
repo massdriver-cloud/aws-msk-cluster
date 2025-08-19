@@ -1,77 +1,75 @@
 schema: draft-07
 name: aws-msk-cluster
-description: "Amazon Managed Streaming for Apache Kafka (MSK). Securely stream data with a fully managed, highly available Apache Kafka service."
-source_url: github.com/massdriver-cloud/aws-msk-cluster
-access: "public"
-type: bundle
-
+version: 1.0.0
+description: Amazon Managed Streaming for Apache Kafka (MSK). Securely stream data with a fully managed, highly available Apache Kafka service.
+source_url: https://github.com/massdriver-cloud/aws-msk-cluster
+type: application
 steps:
-  - path: src
-    provisioner: terraform
-
+- path: src
+  provisioner: opentofu
 params:
   examples:
-    - __name: Staging
-      kafka_version: "2.6.2"
-      brokers_per_zone: 1
-      instance_type: kafka.t3.small
-      volume_size: 100
-      logging_method: cloudwatch
-    - __name: Production
-      kafka_version: "2.6.2"
-      brokers_per_zone: 1
-      instance_type: kafka.m5.2xlarge
-      volume_size: 500
-      logging_method: s3
+  - __name: Staging
+    kafka_version: 2.6.2
+    brokers_per_zone: 1
+    instance_type: kafka.t3.small
+    volume_size: 100
+    logging_method: cloudwatch
+  - __name: Production
+    kafka_version: 2.6.2
+    brokers_per_zone: 1
+    instance_type: kafka.m5.2xlarge
+    volume_size: 500
+    logging_method: s3
   required:
-    - kafka_version
-    - brokers_per_zone
-    - instance_type
-    - volume_size
-    - logging_method
+  - kafka_version
+  - brokers_per_zone
+  - instance_type
+  - volume_size
+  - logging_method
   properties:
     kafka_version:
       type: string
       title: Kafka Version
       description: The version of Kafka to run
-      default: "2.6.2"
+      default: 2.6.2
       enum:
-        - "2.8.1"
-        - "2.8.0"
-        - "2.7.2"
-        - "2.7.0"
-        - "2.6.3"
-        - "2.6.2"
-        - "2.6.1"
-        - "2.6.0"
-        - "2.5.1"
-        - "2.4.1.1"
-        - "2.3.1"
-        - "2.2.1"
+      - 2.8.1
+      - 2.8.0
+      - 2.7.2
+      - 2.7.0
+      - 2.6.3
+      - 2.6.2
+      - 2.6.1
+      - 2.6.0
+      - 2.5.1
+      - 2.4.1.1
+      - 2.3.1
+      - 2.2.1
     brokers_per_zone:
       type: number
       title: Brokers Per AZ
       description: Number of brokers per availability zone.
       default: 1
       enum:
-        - 1
-        - 2
-        - 3
-        - 4
+      - 1
+      - 2
+      - 3
+      - 4
     instance_type:
       type: string
       title: Instance Type
       description: Type of instance for brokers.
       enum:
-        - kafka.t3.small
-        - kafka.m5.large
-        - kafka.m5.xlarge
-        - kafka.m5.2xlarge
-        - kafka.m5.4xlarge
-        - kafka.m5.8xlarge
-        - kafka.m5.12xlarge
-        - kafka.m5.16xlarge
-        - kafka.m5.24xlarge
+      - kafka.t3.small
+      - kafka.m5.large
+      - kafka.m5.xlarge
+      - kafka.m5.2xlarge
+      - kafka.m5.4xlarge
+      - kafka.m5.8xlarge
+      - kafka.m5.12xlarge
+      - kafka.m5.16xlarge
+      - kafka.m5.24xlarge
     volume_size:
       type: integer
       title: Broker Volume Size (GiB)
@@ -82,35 +80,30 @@ params:
       type: string
       title: Logging Method
       description: Method used to store kafka logs
-      default: "cloudwatch"
+      default: cloudwatch
       enum:
-        - "cloudwatch"
-        - "s3"
-
-# schema-connections.json
-# Named list of input connections (artifacts) (map[name]artifact)
+      - cloudwatch
+      - s3
 connections:
   required:
-    - aws_authentication
-    - vpc
+  - aws_authentication
+  - vpc
   properties:
     aws_authentication:
-      $ref: massdriver/aws-iam-role
+      "$ref": massdriver/aws-iam-role
     vpc:
-      $ref: massdriver/aws-vpc
-
+      "$ref": massdriver/aws-vpc
 artifacts:
   required:
-    - authentication
+  - authentication
   properties:
     authentication:
-      $ref: massdriver/kafka-authentication
-
+      "$ref": massdriver/kafka-authentication
 ui:
   ui:order:
-    - kafka_version
-    - brokers_per_zone
-    - instance_type
-    - volume_size
-    - logging_method
-    - "*"
+  - kafka_version
+  - brokers_per_zone
+  - instance_type
+  - volume_size
+  - logging_method
+  - "*"
