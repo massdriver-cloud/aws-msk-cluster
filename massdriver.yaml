@@ -31,11 +31,29 @@ params:
       type: string
       title: Kafka Version
       description: The version of Kafka to run
-      default: 2.6.2
       enum:
+      - 4.1.x.kraft
+      - 4.0.x.kraft
+      - 3.9.x.kraft
+      - 3.9.x
+      - 3.8.x.kraft
+      - 3.8.x
+      - 3.8.link
+      - 3.7.x.kraft
+      - 3.7.x
+      - 3.6.0.1
+      - 3.6.0
+      - 3.5.1
+      - 3.4.0
+      - 3.3.2
+      - 3.3.1
+      - 3.2.0
+      - 3.1.1
+      - 2.8.2.tiered
       - 2.8.1
       - 2.8.0
       - 2.7.2
+      - 2.7.1
       - 2.7.0
       - 2.6.3
       - 2.6.2
@@ -43,8 +61,11 @@ params:
       - 2.6.0
       - 2.5.1
       - 2.4.1.1
+      - 2.4.1
       - 2.3.1
       - 2.2.1
+      - 2.1.0
+      - 1.1.1
     brokers_per_zone:
       type: number
       title: Brokers Per AZ
