@@ -110,15 +110,15 @@ connections:
   - vpc
   properties:
     aws_authentication:
-      "$ref": massdriver/aws-iam-role
+      "$ref": aws-iam-role
     vpc:
-      "$ref": massdriver/aws-vpc
+      "$ref": aws-vpc
 artifacts:
   required:
   - authentication
   properties:
     authentication:
-      "$ref": massdriver/kafka-authentication
+      "$ref": kafka-authentication
 ui:
   ui:order:
   - kafka_version
