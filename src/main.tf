@@ -1,17 +1,17 @@
 locals {
   server_properties = ""
-  subnets           = [for subnet in slice(var.vpc.data.infrastructure.internal_subnets, 0, 3) : element(split("/", subnet["arn"]), 1)]
-  num_zones         = min(3, length(var.vpc.data.infrastructure.internal_subnets)) # must be 2 or 3
-  vpc_id            = element(split("/", var.vpc.data.infrastructure.arn), 1)
+  subnets           = [for subnet in slice(var.vpc.infrastructure.internal_subnets, 0, 3) : element(split("/", subnet["arn"]), 1)]
+  num_zones         = min(3, length(var.vpc.infrastructure.internal_subnets)) # must be 2 or 3
+  vpc_id            = element(split("/", var.vpc.infrastructure.arn), 1)
 }
 
 resource "random_shuffle" "subnets" {
-  input        = [for subnet in var.vpc.data.infrastructure.internal_subnets : element(split("/", subnet["arn"]), 1)]
+  input        = [for subnet in var.vpc.infrastructure.internal_subnets : element(split("/", subnet["arn"]), 1)]
   result_count = local.num_zones
 
   // reset if the VPC changes
   keepers = {
-    "vpc_arn" = var.vpc.data.infrastructure.arn
+    "vpc_arn" = var.vpc.infrastructure.arn
   }
 }
 
@@ -62,7 +62,7 @@ resource "aws_security_group_rule" "external_kafka_tls" {
   to_port           = 9094
   protocol          = "tcp"
   security_group_id = aws_security_group.external_security_group.id
-  cidr_blocks       = [var.vpc.data.infrastructure.cidr]
+  cidr_blocks       = [var.vpc.infrastructure.cidr]
   type              = "ingress"
 }
 
@@ -73,7 +73,7 @@ resource "aws_security_group_rule" "external_zookeeper_tls" {
   to_port           = 2182
   protocol          = "tcp"
   security_group_id = aws_security_group.external_security_group.id
-  cidr_blocks       = [var.vpc.data.infrastructure.cidr]
+  cidr_blocks       = [var.vpc.infrastructure.cidr]
   type              = "ingress"
 }
 
